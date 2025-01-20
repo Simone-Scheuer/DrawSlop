@@ -1,0 +1,10 @@
+.canvas-page {
+  min-height: 100vh;
+  background: #f5f5f7;
+  padding-top: 60px;
+}
+
+/* Adjust the canvas wrapper to account for the navigation */
+.canvas-wrapper {
+  padding-top: 20px;
+} 
