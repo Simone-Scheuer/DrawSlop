@@ -18,20 +18,67 @@
   text-align: center;
 }
 
-.coming-soon {
+.loading-message {
+  text-align: center;
+  margin: 4rem 0;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0066cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-top: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+  color: #ff3b30;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retry-button:hover {
+  background: #004499;
+}
+
+.no-drawings {
   text-align: center;
   color: #86868b;
   font-size: 1.2rem;
-  margin-bottom: 3rem;
+  margin: 4rem 0;
 }
 
-.placeholder-grid {
+.drawings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
 }
 
-.placeholder-item {
+.drawing-item {
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -39,19 +86,60 @@
   transition: transform 0.2s ease;
 }
 
-.placeholder-item:hover {
+.drawing-item:hover {
   transform: translateY(-5px);
 }
 
-.placeholder-image {
+.drawing-item img {
   width: 100%;
-  height: 200px;
-  background: linear-gradient(135deg, #e6e6e6 0%, #f5f5f5 100%);
+  object-fit: contain;
+  background: #f5f5f7;
 }
 
-.placeholder-item p {
+.missing-image {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f7;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.drawing-info {
   padding: 1rem;
   text-align: center;
-  color: #1d1d1f;
+  background: white;
+}
+
+.drawing-title {
   font-size: 1.1rem;
+  color: #1d1d1f;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+  word-break: break-word;
+}
+
+.drawing-date {
+  font-size: 0.8rem;
+  color: #86868b;
+  margin-bottom: 0.5rem;
+}
+
+.delete-button {
+  background: #ff3b30;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.delete-button:hover {
+  background: #ff2419;
+  transform: translateY(-1px);
 } 

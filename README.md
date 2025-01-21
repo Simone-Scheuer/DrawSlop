@@ -1,4 +1,4 @@
-# Sketch App
+# DrawSlop App
 
 A modern, web-based drawing application built with React. Features an intuitive canvas interface with various drawing tools and a clean, Apple-inspired design.
 
@@ -24,40 +24,8 @@ A modern, web-based drawing application built with React. Features an intuitive 
 1. Clone the repository:
 ```bash
 git clone [your-repo-url]
-cd sketch-app
+cd drawslop-app
 ```
 
 2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the development server:
-```bash
-npm start
-```
-
-The app will be available at `http://localhost:1234`
-
-### Building for Production
-
-To create a production build:
-```bash
-npm run build
-```
-
-## Tech Stack
-
-- React
-- React Router
-- HTML5 Canvas
-- Parcel Bundler
-- CSS3 with modern features
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+``

@@ -8,37 +8,233 @@
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f5f5f7;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.canvas-container {
-  padding: 1rem;
-  background-color: #f5f5f7;
+.canvas-page {
+  height: 100vh;
+  padding: 0;
+  background: #f5f5f7;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  width: 100%;
-}
-
-.canvas {
-  border-radius: 12px;
-  display: block;
-  height: 75vh;
-  width: 90%;
-  margin: 0.5rem auto;
-  cursor: crosshair;
-  background-color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
 }
 
 .canvas-wrapper {
+  position: relative;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas {
+  display: block;
+  background: transparent;
+  border-radius: 0;
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
+  max-height: 100%;
+  cursor: crosshair;
+}
+
+.canvas:hover {
+  cursor: crosshair; /* Use default crosshair for testing */
+}
+
+.toolbar {
+  display: flex;
   gap: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+  z-index: 100;
+}
+
+.tool-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-right: 2px solid #eee;
+  height: 42px;
+}
+
+.tool-group:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.tool-group:first-child {
+  padding-left: 0;
+}
+
+.color-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar input[type="color"] {
+  width: 42px;
+  height: 42px;
+  padding: 2px;
+  border: 2px solid #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  background: white;
+}
+
+.toolbar input[type="color"]:hover {
+  border-color: #ddd;
+}
+
+.toolbar input[type="range"] {
+  width: 100px;
+  margin: 0 0.5rem;
+}
+
+.toolbar button {
+  padding: 0.5rem 0.75rem;
+  background: #f5f5f7;
+  border-radius: 6px;
+  color: #1d1d1f;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  min-width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.toolbar button:hover {
+  background: #e5e5e7;
+  transform: translateY(-1px);
+}
+
+.toolbar button.active {
+  background: #0066cc;
+  color: white;
+}
+
+.toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.download-btn {
+  background: #34c759 !important;
+  color: white !important;
+}
+
+.download-btn:hover {
+  background: #248a3d !important;
+}
+
+.publish-btn {
+  background: #0066cc !important;
+  color: white !important;
+}
+
+.publish-btn:hover {
+  background: #004499 !important;
+}
+
+.publish-btn:disabled {
+  background: #999 !important;
+}
+
+.name-input-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.name-input-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+}
+
+.name-input-modal h3 {
+  margin: 0 0 1rem 0;
+  color: #1d1d1f;
+}
+
+.name-input-modal input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.name-input-modal input:focus {
+  border-color: #0066cc;
+  outline: none;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-buttons button:first-child {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.modal-buttons button:last-child {
+  background: #0066cc;
+  color: white;
+}
+
+.modal-buttons button:hover {
+  transform: translateY(-1px);
+}
+
+.modal-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .title {
@@ -48,5 +244,11 @@ body {
   color: #b3b3bc;
   margin-bottom: 1rem;
   letter-spacing: -0.5px;
+}
+
+.drawings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem; /* Adjust this value to control spacing between items */
 }
 

@@ -61,6 +61,13 @@
   -webkit-text-fill-color: transparent;
 }
 
+.hero-section h1 del {
+  text-decoration: line-through;
+  text-decoration-color: #ff3b30;
+  text-decoration-thickness: 6px;
+  color: inherit;
+}
+
 .hero-section p {
   font-size: 1.5rem;
   color: #86868b;

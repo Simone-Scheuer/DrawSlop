@@ -1,23 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navigation from '../components/Navigation';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
   return (
     <div className="home-container">
-      <nav className="main-nav">
-        <Link to="/" className="nav-logo">Sketch</Link>
-        <div className="nav-links">
-          <Link to="/canvas">Canvas</Link>
-          <Link to="/gallery">Gallery</Link>
-        </div>
-      </nav>
-      
-      <main className="hero-section">
-        <h1>Create Beautiful Sketches</h1>
-        <p>Express your creativity with our intuitive drawing tools</p>
-        <Link to="/canvas" className="cta-button">Start Drawing</Link>
-      </main>
+      <Navigation />
+      <div className="hero-section">
+        <h1>Create <del>Beautiful</del> Art</h1>
+        <p className="subtitle">Welcome to the internet's graffiti wall</p>
+        <Link to="/canvas" className="cta-button">Start Drawing Slop</Link>
+      </div>
 
       <section className="features">
         <div className="feature">
