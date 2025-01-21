@@ -67,7 +67,7 @@
 
 .no-drawings {
   text-align: center;
-  color: #86868b;
+  color: white;
   font-size: 1.2rem;
   margin: 4rem 0;
 }
@@ -93,7 +93,8 @@
 .drawing-item img {
   width: 100%;
   object-fit: contain;
-  background: #f5f5f7;
+  background: white;
+  aspect-ratio: 16/9;
 }
 
 .missing-image {
@@ -108,7 +109,7 @@
 }
 
 .drawing-info {
-  padding: 1rem;
+  padding: 0.5rem;
   text-align: center;
   background: white;
 }
