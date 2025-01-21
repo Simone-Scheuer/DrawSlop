@@ -79,9 +79,9 @@ const GalleryPage = () => {
                   }}
                 />
                 <div className="drawing-info">
-                <p className="drawing-title">{drawing.title || 'Untitled'}</p> {/* Add title rendering here */}
+                  <p className="drawing-title">{drawing.title || 'Untitled'}</p>
                   <p className="drawing-date">
-                    {new Date(drawing.createdAt).toLocaleDateString()}
+                    {new Date(drawing.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>

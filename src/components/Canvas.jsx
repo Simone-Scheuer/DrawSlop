@@ -20,27 +20,45 @@ const Canvas = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    
+    const context = canvas.getContext('2d');
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    contextRef.current = context;
+
+    // Load canvas state from local storage
+    const savedCanvas = localStorage.getItem('canvasState');
+    if (savedCanvas) {
+      const img = new Image();
+      img.src = savedCanvas;
+      img.onload = () => {
+        context.drawImage(img, 0, 0);
+      };
+    }
+
     const updateCanvasSize = () => {
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
       const rect = canvas.getBoundingClientRect();
+
+      // Save the current canvas state
+      const currentState = canvas.toDataURL();
+
+      // Update canvas dimensions
       canvas.width = rect.width;
       canvas.height = rect.height;
-      
-      const context = canvas.getContext('2d');
-      context.lineCap = 'round';
-      context.lineJoin = 'round';
-      contextRef.current = context;
-      
-      // Fill with white background
-      context.fillStyle = '#ffffff';
-      context.fillRect(0, 0, rect.width, rect.height);
-      
+
+      // Restore the saved state
+      const img = new Image();
+      img.src = currentState;
+      img.onload = () => {
+        context.drawImage(img, 0, 0);
+      };
+
       updateBrushSettings();
     };
 
     // Initial setup
     updateCanvasSize();
-    saveCanvasState();
 
     // Update size on window resize
     const handleResize = () => {
@@ -60,7 +78,7 @@ const Canvas = () => {
   const updateBrushSettings = () => {
     const context = contextRef.current;
     if (!context) return; // Guard against null context
-    
+
     context.lineWidth = brushSize;
     context.strokeStyle = brushColor;
     context.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
@@ -91,7 +109,6 @@ const Canvas = () => {
 
   const startDrawing = (event) => {
     const coords = getCoordinates(event);
-    
     if (isDropperActive) {
       const color = getPixelColor(coords.x, coords.y);
       setBrushColor(color);
@@ -112,6 +129,7 @@ const Canvas = () => {
     const context = contextRef.current;
     context.lineTo(coords.x, coords.y);
     context.stroke();
+    saveCanvasState(); // Save state after each stroke
   };
 
   const handleWindowMouseMove = (event) => {
@@ -210,6 +228,7 @@ const Canvas = () => {
   const saveCanvasState = () => {
     const canvas = canvasRef.current;
     const newState = canvas.toDataURL();
+    localStorage.setItem('canvasState', newState); // Save to local storage
     setUndoStack(prevStack => [...prevStack, newState]);
   };
 
