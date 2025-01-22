@@ -18,6 +18,9 @@ const Canvas = () => {
   const [undoStack, setUndoStack] = useState([]);
   const { user } = useAuth();
 
+  const MAX_UNDO_STACK = 50;
+
+  // Initialize canvas and context
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
@@ -25,14 +28,35 @@ const Canvas = () => {
     context.lineJoin = 'round';
     contextRef.current = context;
 
-    // Load canvas state from local storage
-    const savedCanvas = localStorage.getItem('canvasState');
-    if (savedCanvas) {
-      const img = new Image();
-      img.src = savedCanvas;
-      img.onload = () => {
-        context.drawImage(img, 0, 0);
-      };
+    // Load canvas data from local storage
+    const canvasData = localStorage.getItem('canvasData');
+    if (canvasData) {
+      try {
+        const parsedData = JSON.parse(canvasData);
+        const { undoStack: savedUndoStack, brushColor: savedBrushColor, brushSize: savedBrushSize } = parsedData;
+
+        // Initialize brush settings
+        if (savedBrushColor) setBrushColor(savedBrushColor);
+        if (savedBrushSize) setBrushSize(savedBrushSize);
+
+        // Load the latest canvas state
+        if (savedUndoStack && savedUndoStack.length > 0) {
+          const lastState = savedUndoStack[savedUndoStack.length - 1];
+          const img = new Image();
+          img.src = lastState;
+          img.onload = () => {
+            context.drawImage(img, 0, 0);
+          };
+          setUndoStack(savedUndoStack);
+        } else {
+          saveCanvasState(); // Save initial blank state
+        }
+      } catch (error) {
+        console.error('Error parsing canvas data from localStorage:', error);
+        saveCanvasState(); // Save initial blank state if parsing fails
+      }
+    } else {
+      saveCanvasState(); // Save initial blank state if no data found
     }
 
     const updateCanvasSize = () => {
@@ -51,7 +75,7 @@ const Canvas = () => {
       const img = new Image();
       img.src = currentState;
       img.onload = () => {
-        context.drawImage(img, 0, 0);
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
       };
 
       updateBrushSettings();
@@ -75,6 +99,7 @@ const Canvas = () => {
     };
   }, []);
 
+  // Update brush settings based on state
   const updateBrushSettings = () => {
     const context = contextRef.current;
     if (!context) return; // Guard against null context
@@ -84,12 +109,14 @@ const Canvas = () => {
     context.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
   };
 
+  // Update brush settings when dependencies change
   useEffect(() => {
     if (contextRef.current) { // Only update if context exists
       updateBrushSettings();
     }
   }, [brushColor, brushSize, isErasing]);
 
+  // Get canvas coordinates from mouse event
   const getCoordinates = (event) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -101,14 +128,17 @@ const Canvas = () => {
     };
   };
 
+  // Get pixel color at specific coordinates
   const getPixelColor = (x, y) => {
     const context = contextRef.current;
     const pixelData = context.getImageData(x, y, 1, 1).data;
-    return `#${[...pixelData].slice(0, 3).map(x => x.toString(16).padStart(2, '0')).join('')}`;
+    return `#${[...pixelData].slice(0, 3).map(px => px.toString(16).padStart(2, '0')).join('')}`;
   };
 
+  // Start drawing
   const startDrawing = (event) => {
     const coords = getCoordinates(event);
+    
     if (isDropperActive) {
       const color = getPixelColor(coords.x, coords.y);
       setBrushColor(color);
@@ -122,6 +152,7 @@ const Canvas = () => {
     setIsDrawing(true);
   };
 
+  // Draw on the canvas
   const draw = (event) => {
     if (!isDrawing || isDropperActive) return;
 
@@ -129,9 +160,9 @@ const Canvas = () => {
     const context = contextRef.current;
     context.lineTo(coords.x, coords.y);
     context.stroke();
-    saveCanvasState(); // Save state after each stroke
   };
 
+  // Handle mouse move outside of canvas
   const handleWindowMouseMove = (event) => {
     if (!isDrawing) return;
 
@@ -141,20 +172,24 @@ const Canvas = () => {
     context.stroke();
   };
 
+  // Stop drawing and save state
   const stopDrawing = () => {
     if (!isDrawing) return;
     const context = contextRef.current;
     context.closePath();
     setIsDrawing(false);
-    saveCanvasState();
+    saveCanvasState(); // Save state only when drawing is finished
   };
 
+  // Clear the canvas
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const context = contextRef.current;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    saveCanvasState(); // Save state after clearing
   };
 
+  // Download the canvas as an image
   const downloadCanvas = () => {
     const canvas = canvasRef.current;
     const link = document.createElement('a');
@@ -163,6 +198,7 @@ const Canvas = () => {
     link.click();
   };
 
+  // Handle publish button click
   const handlePublishClick = () => {
     if (!user) {
       alert('Please sign in to publish your artwork');
@@ -171,6 +207,7 @@ const Canvas = () => {
     setShowNameInput(true);
   };
 
+  // Handle publish form submission
   const handlePublishSubmit = async (e) => {
     e.preventDefault();
     if (!drawingName.trim()) {
@@ -194,7 +231,7 @@ const Canvas = () => {
       setShowNameInput(false);
       setDrawingName('');
     } catch (error) {
-      console.error('Error publishing artwork:', error);
+      console.error('Error publishing drawing:', error);
       let errorMessage = 'Failed to publish artwork. ';
       
       if (error.code === 'storage/unauthorized') {
@@ -213,6 +250,7 @@ const Canvas = () => {
     }
   };
 
+  // Update cursor based on tool selection
   useEffect(() => {
     const canvas = canvasRef.current;
     if (isDropperActive) {
@@ -224,33 +262,56 @@ const Canvas = () => {
     }
   }, [isDropperActive, isErasing]);
 
-  // Save canvas state after each stroke
+  // Save canvas state to undo stack and update localStorage
   const saveCanvasState = () => {
     const canvas = canvasRef.current;
     const newState = canvas.toDataURL();
-    localStorage.setItem('canvasState', newState); // Save to local storage
-    setUndoStack(prevStack => [...prevStack, newState]);
+
+    setUndoStack(prevStack => {
+      const updatedStack = [...prevStack, newState];
+      if (updatedStack.length > MAX_UNDO_STACK) {
+        updatedStack.shift(); // Remove the oldest state
+      }
+      const canvasData = {
+        undoStack: updatedStack,
+        brushColor,
+        brushSize
+      };
+      localStorage.setItem('canvasData', JSON.stringify(canvasData));
+      return updatedStack;
+    });
   };
 
-  // Undo last action
+  // Undo last action and update localStorage
   const handleUndo = () => {
     if (undoStack.length <= 1) return; // Keep at least the initial state
     
-    const canvas = canvasRef.current;
-    const context = contextRef.current;
-    const previousState = undoStack[undoStack.length - 2]; // Get the previous state
-    
-    const img = new Image();
-    img.src = previousState;
-    img.onload = () => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-    
-    setUndoStack(prevStack => prevStack.slice(0, -1));
+    setUndoStack(prevStack => {
+      const updatedUndoStack = prevStack.slice(0, -1);
+      const previousState = updatedUndoStack[updatedUndoStack.length - 1];
+
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      
+      const img = new Image();
+      img.src = previousState;
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+
+      const canvasData = {
+        undoStack: updatedUndoStack,
+        brushColor,
+        brushSize
+      };
+      localStorage.setItem('canvasData', JSON.stringify(canvasData));
+
+      return updatedUndoStack;
+    });
   };
 
-  // Add keyboard shortcut for undo
+  // Add keyboard shortcuts for undo
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
@@ -261,7 +322,35 @@ const Canvas = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undoStack]);
+  }, [undoStack, brushColor, brushSize]);
+
+  // Update localStorage when brushColor changes
+  useEffect(() => {
+    const canvasData = localStorage.getItem('canvasData');
+    if (canvasData) {
+      try {
+        const parsedData = JSON.parse(canvasData);
+        parsedData.brushColor = brushColor;
+        localStorage.setItem('canvasData', JSON.stringify(parsedData));
+      } catch (error) {
+        console.error('Error updating brushColor in localStorage:', error);
+      }
+    }
+  }, [brushColor]);
+
+  // Update localStorage when brushSize changes
+  useEffect(() => {
+    const canvasData = localStorage.getItem('canvasData');
+    if (canvasData) {
+      try {
+        const parsedData = JSON.parse(canvasData);
+        parsedData.brushSize = brushSize;
+        localStorage.setItem('canvasData', JSON.stringify(parsedData));
+      } catch (error) {
+        console.error('Error updating brushSize in localStorage:', error);
+      }
+    }
+  }, [brushSize]);
 
   return (
     <div className="canvas-page">
@@ -280,7 +369,7 @@ const Canvas = () => {
         <div className="tool-group">
           <button
             onClick={handleUndo}
-            disabled={undoStack.length === 0}
+            disabled={undoStack.length <= 1}
             title="Undo (Ctrl/Cmd + Z)"
           >
             ↩️ Undo
