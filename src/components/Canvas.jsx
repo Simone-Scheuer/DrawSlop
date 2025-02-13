@@ -400,7 +400,7 @@ const Canvas = () => {
           <input
             type="range"
             min="1"
-            max="50"
+            max="400"
             value={brushSize}
             onChange={(e) => setBrushSize(parseInt(e.target.value))}
             title="Brush Size"
